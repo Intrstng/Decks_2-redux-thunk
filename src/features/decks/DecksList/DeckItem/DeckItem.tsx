@@ -26,7 +26,7 @@ export const DeckItem = ({deck}: DeckProps) => {
         dispatch(updateDeckTC({id: deck.id, name: `${deck.name} updated`}))
             .finally(() => setIsLoading(false))
     }
-    console.log('isTestingDeck', isTestingDeck)
+
     return (
         <li className={s.item}>
             <h3 className={s.title}>
