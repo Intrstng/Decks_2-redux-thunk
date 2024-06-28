@@ -1,9 +1,8 @@
-import { Dispatch } from 'redux'
 import { decksAPI, UpdateDeckParams } from './decks-api.ts'
 import { addDeckAC, deleteDeckAC, setDecksAC, updateDeckAC } from './decks-reducer.ts'
 import { AppThunk } from '../../app/store';
 import { setAppStatusAC } from '../../app/app-reducer';
-import axios from 'axios';
+import { handleError } from '../../common/utils/handle-error';
 
 export const fetchDecksTC = (): AppThunk => async (dispatch) => {
     dispatch(setAppStatusAC('loading'))
@@ -35,11 +34,11 @@ export const deleteDeckTC = (id: string): AppThunk => async (dispatch) => {
 }
 
 export type ErrorMessageResponseFromServer = {
-	errorMessages: ErrorMessages[];
+    errorMessages: ErrorMessages[];
 }
 export type ErrorMessages = {
-	field: string;
-	message: string;
+    field: string;
+    message: string;
 }
 
 // Для проверки:
@@ -54,14 +53,6 @@ export const updateDeckTC = (params: UpdateDeckParams): AppThunk => async (dispa
         const response = await decksAPI.updateDeck(params)
         dispatch(updateDeckAC(response.data))
     } catch (e) {
-        let errorMsg: string
-        if (axios.isAxiosError<ErrorMessageResponseFromServer>(e)) { // Типизация ошибки Axios
-            // errorMsg = e.response ? (3.Server Error) : (1.Network Error)
-            errorMsg = e.response ? e.response.data.errorMessages[0].message
-                                  : e.message;
-        } else { // (2.Ошибка не в Axios запросе)
-            errorMsg = (e as Error).message;
-        }
-        console.log(errorMsg)
+        handleError(e, dispatch); // см. utils
     }
 }
