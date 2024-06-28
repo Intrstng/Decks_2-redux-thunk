@@ -2,12 +2,14 @@ import s from './AddNewPostForm.module.css'
 import { useForm } from 'react-hook-form'
 import { useAppDispatch } from '../../../app/store.ts'
 import { addDeckTC } from '../decks-thunks.ts'
+import { useState } from 'react';
 
 type FormValues = {
   name: string
 }
 
 export const AddNewDeckForm = () => {
+  const [isLoading, setIsLoading] =  useState<boolean>(false);
   const dispatch = useAppDispatch()
 
   const {
@@ -22,9 +24,10 @@ export const AddNewDeckForm = () => {
   })
 
   const onSubmit = (data: FormValues) => {
-    dispatch(addDeckTC(data.name)).then(() => {
-      reset()
-    })
+    setIsLoading(true)
+    dispatch(addDeckTC(data.name))
+        .then((res) => reset())
+        .finally(() => setIsLoading(false))
   }
 
   return (
@@ -43,7 +46,7 @@ export const AddNewDeckForm = () => {
         />
         <p className={s.errorMessage}>{errors.name && errors.name.message}</p>
       </label>
-      <button type="submit">Add new deck</button>
+      <button disabled={isLoading} type="submit">Add new deck</button>
     </form>
   )
 }
